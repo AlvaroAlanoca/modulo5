@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tienda Pokémon</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f7f7f7, #e3f2fd);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #ffcb05;
+      color: #2a75bb;
+      text-align: center;
+      padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      margin: 15px;
+      width: 220px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card img {
+      width: 150px;
+      margin-top: 15px;
+    }
+    .card h3 {
+      margin: 10px 0;
+      color: #2a75bb;
+    }
+    .card p {
+      font-weight: bold;
+      color: #555;
+    }
+    .card button {
+      background-color: #2a75bb;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .card button:hover {
+      background-color: #1c4d80;
+    }
+    #cart {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      padding: 15px;
+      width: 250px;
+      font-size: 14px;
+    }
+    #cart h3 {
+      margin-top: 0;
+      color: #2a75bb;
+    }
+    #cart ul {
+      list-style: none;
+      padding: 0;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    #cart ul li {
+      border-bottom: 1px solid #ddd;
+      padding: 5px 0;
+    }
+    #confirm-section {
+      display: none;
+      padding: 40px;
+      text-align: center;
+    }
+    #confirm-section h2 {
+      color: #2a75bb;
+    }
+    #confirm-section button {
+      margin: 15px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn-back {
+      background: #ffcb05;
+      color: #2a75bb;
+    }
+    .btn-back:hover {
+      background: #e0b700;
+    }
+    .btn-finish {
+      background: #2a75bb;
+      color: white;
+    }
+    .btn-finish:hover {
+      background: #1c4d80;
+    }
+  </style>
+</head>
+<body>
+  <header>Tienda Pokémon</header>
+
+  <!-- Sección de productos -->
+  <div id="main-section" class="container">
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="Pikachu">
+      <h3>Pikachu</h3>
+      <p>$20</p>
+      <button onclick="addToCart('Pikachu', 20)">Agregar al carrito</button>
+    </div>
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" alt="Bulbasaur">
+      <h3>Bulbasaur</h3>
+      <p>$15</p>
+      <button onclick="addToCart('Bulbasaur', 15)">Agregar al carrito</button>
+    </div>
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" alt="Charmander">
+      <h3>Charmander</h3>
+      <p>$18</p>
+      <button onclick="addToCart('Charmander', 18)">Agregar al carrito</button>
+    </div>
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="Squirtle">
+      <h3>Squirtle</h3>
+      <p>$17</p>
+      <button onclick="addToCart('Squirtle', 17)">Agregar al carrito</button>
+    </div>
+  </div>
+
+  <!-- Carrito -->
+  <div id="cart">
+    <h3>Carrito</h3>
+    <ul id="cart-items"></ul>
+    <p><b>Total:</b> $<span id="cart-total">0</span></p>
+    <button onclick="goToConfirm()">Confirmar Reserva</button>
+  </div>
+
+  <!-- Sección de confirmación -->
+  <div id="confirm-section">
+    <h2>Confirmación de Reserva</h2>
+    <p>Has reservado los siguientes productos:</p>
+    <ul id="confirm-list"></ul>
+    <p><b>Total:</b> $<span id="confirm-total"></span></p>
+    <button class="btn-back" onclick="backToMain()">Volver al Menú Principal</button>
+    <button class="btn-finish" onclick="finishOrder()">Finalizar Compra</button>
+  </div>
+
+  <script>
+    let cart = [];
+
+    function addToCart(name, price) {
+      cart.push({name, price});
+      renderCart();
+    }
+
+    function renderCart() {
+      const cartItems = document.getElementById("cart-items");
+      const total = document.getElementById("cart-total");
+      cartItems.innerHTML = "";
+      let sum = 0;
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - $${item.price}`;
+        cartItems.appendChild(li);
+        sum += item.price;
+      });
+      total.textContent = sum;
+    }
+
+    function goToConfirm() {
+      if (cart.length === 0) {
+        alert("El carrito está vacío.");
+        return;
+      }
+      document.getElementById("main-section").style.display = "none";
+      document.getElementById("cart").style.display = "none";
+      document.getElementById("confirm-section").style.display = "block";
+
+      const confirmList = document.getElementById("confirm-list");
+      confirmList.innerHTML = "";
+      let sum = 0;
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - $${item.price}`;
+        confirmList.appendChild(li);
+        sum += item.price;
+      });
+      document.getElementById("confirm-total").textContent = sum;
+    }
+
+    function backToMain() {
+      document.getElementById("main-section").style.display = "flex";
+      document.getElementById("cart").style.display = "block";
+      document.getElementById("confirm-section").style.display = "none";
+    }
+
+    function finishOrder() {
+      alert("¡Compra finalizada con éxito! Gracias por tu reserva.");
+      cart = [];
+      renderCart();
+      backToMain();
+    }
+  </script>
+</body>
+</html>
